@@ -1,0 +1,11 @@
+var config = {};
+
+config.jira = {};
+config.jira.url = "<the URL of the JIRA API>"
+config.jira.default = "<Default URL to calculate velocity>"
+
+config.jira.params = {};
+config.jira.params.query = "<JIRA query string in case you not use a filter>";
+config.jira.params.sprints = "<name of the field in jira representing the sprints (i.e. FixVersion)>";
+
+module.exports = config;

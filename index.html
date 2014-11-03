@@ -1,0 +1,137 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>Basic Trendline</title>
+	<style type="text/css">
+		#chartdiv {
+			width		: 100%;
+			height		: 500px;
+			font-size	: 11px;
+		}	
+	</style>
+	
+	<script src="js/amcharts/amcharts.js" type="text/javascript"></script>
+	<script src="js/amcharts/serial.js" type="text/javascript"></script>
+	<script src="js/jquery/jquery-1.7.2.min.js" type="text/javascript"></script>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/bootstrap/3.3.0/css/bootstrap.min.css">
+
+	<script type="text/javascript">
+		var chart = null;
+		function loadData() {
+			var sprints = document.getElementById('sprints').value;
+			var loading = document.getElementById('loading');
+			if(sprints != "") {
+				$.getJSON("data/jira?versions=" + sprints,function(resp){
+					dataProvider = [];
+					if (typeof(resp.error) == "undefined") {
+						if (resp.data.length > 0) {
+							dataProvider = resp.data;
+							chart.trendLines = [resp.trendline];
+							chart.validateNow();
+							loading.hidden = true;
+						} else {
+							loading.innerHTML = '<b>No data was found for these sprints</b>';
+							loading.className = 'alert alert-warning';
+							loading.hidden = false;
+						}
+					}
+					else {
+						loading.hidden = false;
+						loading.innerHTML = '<b>Attention! houston we have a problem</b>';
+						loading.className = 'alert alert-danger';
+					}
+					chart.dataProvider = dataProvider;
+					chart.validateData();
+					chart.write("chartdiv");
+				});
+			} else {
+				$.getJSON("data/jiraDefault",function(resp){
+					dataProvider = [];
+					if (typeof(resp.error) == "undefined") {
+						if (resp.data.length > 0) {
+							dataProvider = resp.data;
+							chart.trendLines = [resp.trendline];
+							chart.validateNow();
+							loading.hidden = true;
+						} else {
+							loading.innerHTML = '<b>No data was found for these sprints</b>';
+							loading.className = 'alert alert-warning';
+							loading.hidden = false;
+						}
+					}
+					else {
+						loading.hidden = false;
+						loading.innerHTML = '<b>Attention! houston we have a problem</b>';
+						loading.className = 'alert alert-danger';
+					}
+					chart.dataProvider = dataProvider;
+					chart.validateData();
+					chart.write("chartdiv");
+				});
+				
+			}
+			loading.innerHTML = '<b>Attention!</b> chart is loading...you might want a coffee';
+			loading.className = 'alert alert-info';
+			loading.hidden = false;
+		}
+	</script>
+	
+	<script type="text/javascript">
+		chart = AmCharts.makeChart("chartdiv", {
+			"type": "serial",
+			"theme": "light",
+			"autoMargins": false,
+			"marginLeft":30,
+			"marginRight":8,
+			"marginTop":10,
+			"marginBottom":26,
+			"handDrawn": true,
+					
+			"valueAxes": [{
+				"axisAlpha": 0,
+				"position": "left",
+				"minimum": 0
+			}],
+			"startDuration": 1,
+			"graphs": [{
+				"fillAlphas": 1,
+				"title": "storyPoints",
+				"type": "column",
+				"valueField": "storyPoints"
+			}],
+			"categoryField": "sprint",
+			"categoryAxis": {
+				"gridPosition": "start",
+				"axisAlpha":0,
+				"tickLength":0
+			}
+		});	
+</script>
+
+	
+</head>
+<body onLoad="loadData();">
+<div class="container">
+<div class="page-header"><h1>Team Velocity</h1></div>
+<div class="page-header"><h2>Which sprints?</h2></div>
+<p>By default the last three sprints are loaded, click <a href='javascript:void(0)' onClick='document.getElementById("chooseSprint").className="show";'>here</a> to choose sprints</p>
+<div class="hidden" id="chooseSprint">
+	<div class="row">
+		<div class="col-md-4">Sprints (comma separated):</div>
+		<div class="col-md-4"><input type="text" id="sprints" /></div>		
+		<div class="col-md-4">
+			<form action="javascript:loadData()" id="loadDataForm" method="get">
+				<input type="submit" class="btn btn-success" id="loadButton" />
+			</form>
+		</div>		
+	</div>
+<div class="alert alert-info"><b>Warning!</b> Sprints should match with fixVersions in JIRA</div>
+</div>
+
+</table>
+<div class="page-header"><h2>Amazing chart</h2></div>
+<div class="alert alert-info" id="loading" hidden="true"><b>Attention!</b> chart is loading...you might want a coffee</div>
+<div id="chartdiv"></div>	
+</div>
+</body>
+</html>
