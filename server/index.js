@@ -1,4 +1,4 @@
-var config = require('./config/config.js');
+var config = require('./config');
 var parser = require('./lib/jira2json');
 var request = require( 'request' );
 var express = require('express');
