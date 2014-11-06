@@ -1,4 +1,3 @@
-var parser = require('xml2json');
 var xpath = require('xpath');
 var dom = require('xmldom').DOMParser;
 var underscore = require('underscore');
