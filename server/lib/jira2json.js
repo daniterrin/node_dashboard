@@ -117,12 +117,12 @@ Velocity.prototype.computeTrendline = function() {
 		// Finding first sprint
 		var jiraSprint = underscore.first(self.sprints);
 		self.trendline.initialValue = jiraSprint.storyPoints;
-		self.trendline.initialCategory = jiraSprint.sprint;
+		self.trendline.initialCategory = jiraSprint.sprintNo;
 		
 		// Finding last sprint
 		jiraSprint = underscore.last(self.sprints);
 		self.trendline.finalValue = jiraSprint.storyPoints;
-		self.trendline.finalCategory = jiraSprint.sprint;
+		self.trendline.finalCategory = jiraSprint.sprintNo;
 	}
 };
 
