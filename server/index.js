@@ -5,7 +5,7 @@ var express = require('express');
 var underscore = require('underscore');
 var fs = require('fs');
 
-// load config
+// load configuration
 try {
 	var urlJiraDefault = config.jira.default;
 	var urlJira = config.jira.url;
