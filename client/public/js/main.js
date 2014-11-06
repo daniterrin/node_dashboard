@@ -4,11 +4,10 @@ var LOADING_STATUS = { message: '<b>Attention!</b> chart is loading...you might 
 var HIDE_STATUS = { message: '', className: '', hide: true };
 
 function loadData() {
-	var sprints = document.getElementById('sprints').value;
-	var loading = document.getElementById('loading');
+	var sprints = document.getElementById('sprints');
 	var jiraURL = "data/jiraDefault";
-	if(sprints != "") {
-		jiraURL = "data/jira?versions=" + sprints
+	if(sprints != null && sprints.value != "") {
+		jiraURL = "data/jira?versions=" + sprints.value
 	}
 	$.getJSON(jiraURL,function(resp){
 		processResponse(resp);
@@ -60,7 +59,7 @@ function drawChart(dataProvider, trendLines) {
 			"type": "column",
 			"valueField": "storyPoints"
 		}],
-		"categoryField": "sprint",
+		"categoryField": "sprintNo",
 		"categoryAxis": {
 			"gridPosition": "start",
 			"axisAlpha":0,
@@ -73,9 +72,13 @@ function drawChart(dataProvider, trendLines) {
 
 function setLoadingStatus(status) {
 	
-	loading.innerHTML = status.message;
-	loading.className = status.className;
-	loading.hidden = status.hide;
+	var loading = document.getElementById('loading');
+	
+	if (loading != null) {
+		loading.innerHTML = status.message;
+		loading.className = status.className;
+		loading.hidden = status.hide;
+	}
 }
 
 // Main

@@ -29,6 +29,11 @@ app.get('/', function (req, res) {
 	fs.createReadStream( path.join( __dirname, '..', 'client', 'index.html' ) ).pipe( res );
 });
 
+app.get('/large', function (req, res) {
+	res.set('Content-Type', 'text/html');
+	fs.createReadStream( path.join( __dirname, '..', 'client', 'index_xl.html' ) ).pipe( res );
+});
+
 app.get('/data/jira', function (req, res) {
 	res.set('Content-Type', 'text/json');
 	var json = null;
