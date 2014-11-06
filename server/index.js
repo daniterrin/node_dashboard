@@ -4,6 +4,7 @@ var request = require( 'request' );
 var express = require('express');
 var underscore = require('underscore');
 var fs = require('fs');
+var path = require( 'path' );
 
 // load configuration
 try {
@@ -20,19 +21,18 @@ catch(e) {
 	throw "Configuration not valid";
 }
 
-var app = express()
+var app = express();
 app.use( express.static( __dirname + '/../client/public' ) );
 
 app.get('/', function (req, res) {
 	res.set('Content-Type', 'text/html');
-	var obj = fs.readFileSync("./client/index.html");
-	res.send(obj);
-})
+	fs.createReadStream( path.join( __dirname, '..', 'client', 'index.html' ) ).pipe( res );
+});
 
 app.get('/data/jira', function (req, res) {
 	res.set('Content-Type', 'text/json');
 	var json = null;
-	
+
 	try {
 		var urlString = '';
 		if (typeof(req.query.versions) != "undefined") {
@@ -42,7 +42,7 @@ app.get('/data/jira', function (req, res) {
 				urlString += '%22' + sprints[i] + '%22%2C';
 			}
 			urlString = urlString.substr(0,(urlString.length - 3)) + '%29';
-		} 
+		}
 		urlString = urlJira + urlString;
 		console.log("JIRA call: " + urlString);
 		request.get( urlString, {strictSSL: false}, function(err, response, body){
@@ -59,7 +59,7 @@ app.get('/data/jira', function (req, res) {
 app.get('/data/jiraDefault', function (req, res) {
 	res.set('Content-Type', 'text/json');
 	var json = null;
-	
+
 	try {
 		console.log("JIRA call: " + urlJiraDefault);
 		request.get( urlJiraDefault, {strictSSL: false}, function(err, response, body){
