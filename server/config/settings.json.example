@@ -1,0 +1,10 @@
+{
+	"jira": {
+		"default": "<Default URL to calculate velocity>",
+		"url": "<the URL of the JIRA API>"",
+		"params": {
+			"query": "<JIRA query string in case you not use a filter>",
+			"sprints": "<name of the field in jira representing the sprints (i.e. FixVersion)>"
+		}
+	}
+}
