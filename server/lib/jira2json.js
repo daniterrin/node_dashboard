@@ -2,9 +2,6 @@ var xpath = require('xpath');
 var dom = require('xmldom').DOMParser;
 var underscore = require('underscore');
 
-var sprints = [];
-var lastSprints = false;
-
 function JiraItem(id, sprint, storyPoints) {
 	// Properties
 	this.id = id;
@@ -23,15 +20,6 @@ function JiraSprint(sprint) {
 	
 };
 
-// This should not be here
-function Trendline() {
-	this.finalCategory = "";
-	this.initialValue = 0.0;
-	this.initialCategory = "";
-	this.finalValue = 0.0;
-	this.lineColor = "#CC0000";
-}
-
 JiraSprint.prototype.addItem = function(obj) {
 	var self = this;
 	
@@ -41,7 +29,7 @@ JiraSprint.prototype.addItem = function(obj) {
 	}
 }
 
-function Velocity() { 
+function Velocity(filteredSprints, lastSprints) { 
 	// Constants
 	// XPath
 	this.XPATH_KEY_ITEMS = "//item";
@@ -51,7 +39,8 @@ function Velocity() {
 	
 	// Properties
 	this.sprints = [];
-	this.trendline = new Trendline();
+	this.filteredSprints = filteredSprints;
+	this.lastSprints = lastSprints;
 }
 
 Velocity.prototype.computeSprints = function(obj) {
@@ -70,7 +59,7 @@ Velocity.prototype.computeSprints = function(obj) {
 		id = xpath.select1(itemXPath + self.XPATH_KEY_ID, doc).nodeValue;
 		sprint = xpath.select1(itemXPath + self.XPATH_KEY_SPRINT, doc).nodeValue;
 		
-		if (sprints.length == 0 || underscore.contains(sprints,sprint)) {
+		if (self.filteredSprints.length == 0 || underscore.contains(self.filteredSprints, sprint)) {
 			storyPoints = xpath.select1(itemXPath + self.XPATH_KEY_STORY_POINTS, doc);
 			if(typeof(storyPoints) != "undefined") {
 				storyPoints = storyPoints.nodeValue;
@@ -84,10 +73,9 @@ Velocity.prototype.computeSprints = function(obj) {
 		}
     }
 	
-	if (lastSprints) {
+	if (self.lastSprints) {
 		self.sprints = underscore.last(self.sprints, 3);
 	}
-	self.computeTrendline();
 };
 
 Velocity.prototype.addItemToSprints = function(jiraItem, sprintStr) {
@@ -106,41 +94,25 @@ Velocity.prototype.addItemToSprints = function(jiraItem, sprintStr) {
 
 Velocity.prototype.toJson = function() {
 	var self = this;
-	var data = { data: self.sprints, trendline: self.trendline };
-	return JSON.stringify(data);
+	return JSON.stringify(self.sprints);
 };
 
-Velocity.prototype.computeTrendline = function() {
-	var self = this;
-	
-	if(!underscore.isEmpty(self.sprints)) {
-		// Finding first sprint
-		var jiraSprint = underscore.first(self.sprints);
-		self.trendline.initialValue = jiraSprint.storyPoints;
-		self.trendline.initialCategory = jiraSprint.sprintNo;
+module.exports = {
+	toJson: function(xml, _options) {
+		var json = null;
+		var sprints = [];
+		var lastSprints = false;
+
+		if(_options != null) {
+			sprints = _options.sprints;
+			lastSprints = _options.lastSprints;
+		}
 		
-		// Finding last sprint
-		jiraSprint = underscore.last(self.sprints);
-		self.trendline.finalValue = jiraSprint.storyPoints;
-		self.trendline.finalCategory = jiraSprint.sprintNo;
+		if (xml != null) {
+			var velocity = new Velocity(sprints, lastSprints);
+			velocity.computeSprints(xml);
+			json = velocity.toJson();
+		}
+		return json;
 	}
 };
-
-module.exports = function(xml, _options) {
-    var json = null;
-	
-    if(_options != null) {
-        sprints = _options.sprints;
-		lastSprints = _options.lastSprints;
-    }
-	
-	if (xml != null) {
-		var velocity = new Velocity();
-		velocity.computeSprints(xml);
-		json = velocity.toJson();
-    }
-    return json;
-};
-
-var exports = module.exports;
-exports.toJson = require('./jira2json');

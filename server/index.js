@@ -1,5 +1,6 @@
 var parser = require('./lib/jira2json');
 var handler = require('./lib/jiraHandler');
+var chartConverter = require('./lib/chartConverter');
 var express = require('express');
 var fs = require('fs');
 var path = require( 'path' );
@@ -48,7 +49,7 @@ app.use('/data/jira*', function (req, res, next) {
 		var sprints = app.get('sprints');
 		handler.get(useDefault, sprints, function(body) {
 			var options = { sprints: sprints, lastSprints: useDefault };
-			var json = parser.toJson(body, options)
+			var json = chartConverter.getData(parser.toJson(body, options));
 			res.send(json);
 		});
 	} catch(e) {
