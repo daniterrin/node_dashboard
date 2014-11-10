@@ -20,7 +20,7 @@ function processResponse(resp) {
 	trendLines = [];
 	var status = null;
 	
-	if (typeof(resp.error) == "undefined") {
+	if (resp != null && typeof(resp.error) == "undefined") {
 		if (resp.data.length > 0) {
 			dataProvider = resp.data;
 			trendLines = [resp.trendline];
